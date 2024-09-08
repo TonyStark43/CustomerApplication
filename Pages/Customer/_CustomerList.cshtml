@@ -1,0 +1,43 @@
+﻿@model IEnumerable<CustomerApplication.Models.CustomerViewModel>
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            @* <th>Id</th> *@
+            <th>Sr. No.</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>State</th>
+            <th>District</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int serialNumber = 1; // Initialize the serial number
+        }
+        @foreach (var item in Model)
+        {
+            <tr>
+                @* <td>@Html.DisplayFor(modelItem => item.Id)</td> *@
+                <td>@serialNumber</td>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Gender)</td>
+                <td>@Html.DisplayFor(modelItem => item.State)</td>
+                <td>@Html.DisplayFor(modelItem => item.District)</td>
+                <td>
+
+                    <a href="javascript:void(0);" class="text-warning" data-bs-toggle="modal" data-bs-target="#editCustomerModal" onclick="loadCustomerData(@item.Id)">Update</a>
+                    |
+                    <a href="javascript:void(0);" class="text-warning" data-bs-toggle="modal" data-bs-target="#detailsCustomerModal" onclick="loadCustomerDetails(@item.Id)">Details</a>
+                    |
+                    <a href="#" class="text-warning" onclick="confirmDelete('@item.Id')">Delete</a>
+                </td>
+            </tr>
+
+                serialNumber++; // Increment the serial number for the next row
+        }
+    </tbody>
+</table>

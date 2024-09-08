@@ -1,0 +1,158 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Customer List</h1>
+
+<p>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCustomerModal" onclick="loadDropdowns(); resetCustomerForm();">Create New</button>
+</p>
+
+<!-- Partial page customer list -->
+<div>
+<div class="d-flex justify-content-end mb-3">
+
+        
+
+    <select id="pageSize" class="form-select w-10 me-2" onchange="enableApplyButtonBydd()">
+            <option value="10">10 records</option>
+            <option value="5">5 records</option>
+            <option value="20">20 records</option>
+            <option value="50">50 records</option>
+            <option value="100">100 records</option>
+    </select>
+
+    <!-- Sort Dropdown -->
+    <select id="sortBy" class="form-select w-10 me-2" onchange="enableApplyButtonBydd()">
+        <option value="id_asc">Sort by Id(default)</option>
+        <option value="name_asc">Sort by Name(Asc)</option>
+        <option value="name_desc">Sort by Name(Desc)</option>
+    </select>
+
+    <input type="text" id="searchName" placeholder="Search by Name" class="form-control w-10" onkeyup="enableApplyButtonBySearch()" />
+    <button id="searchButton" class="btn btn-primary ms-2" disabled onclick="filteredCustomerList()">Apply</button>
+</div>
+    <div id="customerListContainer">
+    <!-- Customer list will be loaded here via AJAX -->
+</div>
+</div>
+
+<!-- Modal for creating a new customer -->
+<div class="modal fade" id="createCustomerModal" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCustomerModalLabel">Create Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createCustomerForm" method="post" data-url="@Url.Page("Index", "CreateCustomer")">
+                    <div class="form-group">
+                        <label asp-for="CustomerCreateModel.Name" class="control-label"></label>
+                        <input asp-for="CustomerCreateModel.Name" id="customerNameCreate" class="form-control" />
+                        <span asp-validation-for="CustomerCreateModel.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Gender</label>
+                        <select id="genderDropdown" asp-for="CustomerCreateModel.GenderId" class="form-control">
+                            <option value="">Select Gender</option>
+                        </select>
+                        <span asp-validation-for="CustomerCreateModel.GenderId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">State</label>
+                        <select id="stateDropdown" asp-for="CustomerCreateModel.StateId" class="form-control" onchange="loadDistrictsByState(this.value)">
+                            <option value="">Select State</option>
+                        </select>
+                        <span asp-validation-for="CustomerCreateModel.StateId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">District</label>
+                        <select id="districtDropdown" asp-for="CustomerCreateModel.DistrictId" class="form-control">
+                            <option value="">Select District</option>
+                        </select>
+                        <span asp-validation-for="CustomerCreateModel.DistrictId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" onclick="createCustomer()">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for updating an existing customer -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCustomerModalLabel">Update Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCustomerForm" method="post" onsubmit="event.preventDefault(); updateCustomer();" novalidate>
+                    <input type="hidden" id="editCustomerId" name="CustomerUpdateModel.Id" />
+                    <div class="form-group">
+                        <label asp-for="CustomerUpdateModel.Name" class="control-label"></label>
+                        <input asp-for="CustomerUpdateModel.Name" id="editCustomerName" class="form-control" />
+                        <span asp-validation-for="CustomerUpdateModel.Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Gender</label>
+                        <select id="editCustomerGender" asp-for="CustomerUpdateModel.GenderId" class="form-control">
+                            <option value="">Select Gender</option>
+                        </select>
+                        <span asp-validation-for="CustomerUpdateModel.GenderId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">State</label>
+                        <select id="editCustomerState" asp-for="CustomerUpdateModel.StateId" class="form-control" onchange="loadDistrictsByStateEdit(this.value)">
+                            <option value="">Select State</option>
+                        </select>
+                        <span asp-validation-for="CustomerUpdateModel.StateId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">District</label>
+                        <select id="editCustomerDistrict" asp-for="CustomerUpdateModel.DistrictId" class="form-control">
+                            <option value="">Select District</option>
+                        </select>
+                        <span asp-validation-for="CustomerUpdateModel.DistrictId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Update" id="updateButton" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for displaying customer details -->
+<div class="modal fade" id="detailsCustomerModal" tabindex="-1" aria-labelledby="detailsCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsCustomerModalLabel">Customer Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="customerDetailsContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="pagination">
+    <button type="button" class="btn btn-primary" id="previousPage" onclick="handlePrevPageClick">Previous Page</button>
+    <span id="pageNumber" class="mx-3"></span> <!-- Page number will be dynamically updated -->
+    <button type="button" class="btn btn-primary" id="nextPage" onclick="handleNextPageClick">Next Page</button>
+</div>
+
+

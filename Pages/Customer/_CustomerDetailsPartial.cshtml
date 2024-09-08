@@ -1,0 +1,28 @@
+﻿@model CustomerApplication.Models.CustomerDetailViewModel
+
+<dl class="row">
+    <dt class="col-sm-3">
+        @Html.DisplayNameFor(model => model.Name)
+    </dt>
+    <dd class="col-sm-9">
+        @Html.DisplayFor(model => model.Name)
+    </dd>
+    <dt class="col-sm-3">
+        @Html.DisplayNameFor(model => model.Gender)
+    </dt>
+    <dd class="col-sm-9">
+        @Html.DisplayFor(model => model.Gender)
+    </dd>
+    <dt class="col-sm-3">
+        @Html.DisplayNameFor(model => model.State)
+    </dt>
+    <dd class="col-sm-9">
+        @Html.DisplayFor(model => model.State) (StateId: @Model.StateId)
+    </dd>
+    <dt class="col-sm-3">
+        @Html.DisplayNameFor(model => model.District)
+    </dt>
+    <dd class="col-sm-9">
+        @Html.DisplayFor(model => model.District) (DistrictId: @Model.DistrictId)
+    </dd>
+</dl>
